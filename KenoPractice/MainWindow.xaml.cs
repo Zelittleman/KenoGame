@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 namespace KenoPractice
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for MainWindow.xaml 
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -31,7 +31,7 @@ namespace KenoPractice
         {
             try
             {
-                int tries = 0;
+                int tries = 1000;
                 bool bigWin = false;
 
                 List<int> userNumbers = GetUserNumers();
