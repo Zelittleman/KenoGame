@@ -31,7 +31,7 @@ namespace KenoPractice
         {
             try
             {
-                int tries = 1000;
+                int tries = 0;
                 bool bigWin = false;
 
                 List<int> userNumbers = GetUserNumers();
