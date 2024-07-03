@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Drawing;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -20,11 +21,12 @@ namespace KenoPractice
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static Random random = new Random();
+        private static readonly Random random = new Random();
 
         public MainWindow()
         {
             InitializeComponent();
+            startBoardReset();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -47,7 +49,7 @@ namespace KenoPractice
                     results = GenerateUniqueRandomNumbers();                
                     results.Sort();
                     UpdateResultList(results);
-                    bigWin = allWinningResults(results, userNumbers);
+                    bigWin = AllWinningResults(results, userNumbers);
                      
                 }
 
@@ -99,7 +101,7 @@ namespace KenoPractice
             return numbers;
         }
 
-        private bool allWinningResults(List<int> picks, List<int> userNumbers)
+        private bool AllWinningResults(List<int> picks, List<int> userNumbers)
         {
             int matches = userNumbers.Count(userNumber => picks.Contains(userNumber));
             return matches == userNumbers.Count;
@@ -110,5 +112,44 @@ namespace KenoPractice
         {
             ResultsLabel.Content = string.Join(", ", results);
         }
+
+        private void startBoardReset()
+        {
+            int count = 0;
+            string formattedText = " ";
+
+            for(int x = 1;  x<= 80; x++)
+            {
+                if(x < 9)
+                {
+                    formattedText += x.ToString() + "    ";
+                    count++;
+                } else if (x == 9)
+                {
+                    formattedText += x.ToString() + "   ";
+                    count++;
+                } else
+                {
+                    formattedText += x.ToString() + "  ";
+                    count++;
+                }
+                
+
+                if (count % 10 == 0)
+                {
+                    formattedText = formattedText.TrimEnd() + Environment.NewLine;
+                }
+
+                if (count == 40 )
+                {
+                    formattedText = formattedText + Environment.NewLine;
+                }
+            }
+            numberBoard.Document.Blocks.Clear();
+            numberBoard.Document.Blocks.Add(new Paragraph(new Run(formattedText)));
+
+            
+        }
+
     }
 }
