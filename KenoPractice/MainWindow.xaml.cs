@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Runtime.InteropServices;
 
 namespace KenoPractice
 {
@@ -31,6 +32,7 @@ namespace KenoPractice
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            startBoardReset();
             try
             {
                 int tries = 0;
@@ -49,9 +51,10 @@ namespace KenoPractice
                     results = GenerateUniqueRandomNumbers();                
                     results.Sort();
                     UpdateResultList(results);
-                    bigWin = AllWinningResults(results, userNumbers);
-                     
+                    bigWin = AllWinningResults(results, userNumbers);                  
                 }
+
+                HighlightNumbers(results);
 
                 MessageBox.Show($"It took {tries} tries to hit your numbers");
 
@@ -67,7 +70,7 @@ namespace KenoPractice
 
         public static List<int> GenerateUniqueRandomNumbers()
         {
-            
+
             HashSet<int> numbersSet = new HashSet<int>();
 
             while (numbersSet.Count < 20)
@@ -75,6 +78,7 @@ namespace KenoPractice
                 int number = random.Next(1, 81); // Generates a number between 1 and 80 (inclusive)
                 numbersSet.Add(number); // HashSet automatically handles duplicates
             }
+
 
             List<int> numbersList = new List<int>(numbersSet);
             return numbersList;
@@ -105,7 +109,13 @@ namespace KenoPractice
         {
             int matches = userNumbers.Count(userNumber => picks.Contains(userNumber));
             return matches == userNumbers.Count;
+        }
 
+        private (bool win,int count) SingleResults(List<int> picks, List<int> userNumbers)
+        {
+            int matches = userNumbers.Count(userNumber => picks.Contains(userNumber));
+
+            return (matches == userNumbers.Count,matches);
         }
 
         private void UpdateResultList(List<int> results)
@@ -151,5 +161,82 @@ namespace KenoPractice
             
         }
 
+        private void HighlightNumbers(List<int> selectedNumbers)
+        {
+            TextPointer navigator = numberBoard.Document.ContentStart;
+
+            while (navigator.CompareTo(numberBoard.Document.ContentEnd) < 0)
+            {
+                
+                if (navigator.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
+                {
+                    string textRun = navigator.GetTextInRun(LogicalDirection.Forward);
+
+                    foreach (var number in selectedNumbers.ToList())
+                    {
+                        string numberStr = number.ToString();                 
+
+                        int index = textRun.IndexOf(numberStr);
+                        if (index != -1)
+                        {
+                            
+                            TextPointer start = navigator.GetPositionAtOffset(index);
+                            TextPointer end = start.GetPositionAtOffset(numberStr.Length);
+                            TextRange textRange = new TextRange(start, end);
+                            textRange.ApplyPropertyValue(TextElement.BackgroundProperty, Brushes.Red);
+                            selectedNumbers.Remove(number);
+                            break;
+                        }
+
+                    }
+
+                    
+
+                }
+                navigator = navigator.GetNextContextPosition(LogicalDirection.Forward);
+            }
+        }
+
+        private void singleRun_Click(object sender, RoutedEventArgs e)
+        {
+            startBoardReset();
+            try
+            {
+                List<int> userNumbers = GetUserNumers();
+                List<int> results = new List<int> { };
+                int pickCount = userNumbers.Count;
+                bool Win = false;
+                int hits = 0;
+
+                if (userNumbers.Count <= 0)
+                {
+                    throw new FormatException($"Please enter at least one number ");
+                }
+
+                results = GenerateUniqueRandomNumbers();
+                results.Sort();
+                UpdateResultList(results);
+                (Win, hits) = SingleResults(results, userNumbers);
+                HighlightNumbers(results);
+
+                if (Win)
+                {
+                  MessageBox.Show($"Big winner! You matched all your numbers!");
+                } else if(hits > 0)
+                {
+                  MessageBox.Show($"You matched {hits} out of your {pickCount} numbers.");
+                } else
+                {
+                  MessageBox.Show($"You didn't match any numbers.");
+                }
+
+
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("Invalid input: " + ex.Message);
+            }
+        }
     }
 }
