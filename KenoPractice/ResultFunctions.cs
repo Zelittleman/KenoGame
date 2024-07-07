@@ -52,5 +52,44 @@ namespace KenoPractice
                 navigator = navigator.GetNextContextPosition(LogicalDirection.Forward);
             }
         }
+
+        //reset the board
+        public void startBoardReset(MainWindow form)
+        {
+            int count = 0;
+            string formattedText = " ";
+
+            for (int x = 1; x <= 80; x++)
+            {
+                if (x < 9)
+                {
+                    formattedText += x.ToString() + "    ";
+                    count++;
+                }
+                else if (x == 9)
+                {
+                    formattedText += x.ToString() + "   ";
+                    count++;
+                }
+                else
+                {
+                    formattedText += x.ToString() + "  ";
+                    count++;
+                }
+
+
+                if (count % 10 == 0)
+                {
+                    formattedText = formattedText.TrimEnd() + Environment.NewLine;
+                }
+
+                if (count == 40)
+                {
+                    formattedText = formattedText + Environment.NewLine;
+                }
+            }
+            form.numberBoard.Document.Blocks.Clear();
+            form.numberBoard.Document.Blocks.Add(new Paragraph(new Run(formattedText)));
+        }
     }
 }
