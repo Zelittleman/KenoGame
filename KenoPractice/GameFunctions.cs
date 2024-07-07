@@ -39,9 +39,17 @@ namespace KenoPractice
 
             foreach (string part in parts)
             {
+
                 if (int.TryParse(part.Trim(), out int number))
                 {
-                    numbers.Add(number);
+                    if(number < 1 || number > 80)
+                    {
+                        throw new FormatException($"'{number}' is not a valid number. Please enter a number between 1 and 80.");
+                    } else
+                    {
+                        numbers.Add(number);
+                    }
+                    
                 }
                 else
                 {
